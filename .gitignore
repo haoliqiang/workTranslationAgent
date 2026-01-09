@@ -47,7 +47,7 @@ node_modules/
 .npm/
 
 # 构建产物
-apps/frontend/dist/
+frontend/dist/
 
 # ============ 日志 ============
 logs/
@@ -56,7 +56,7 @@ logs/
 
 # ============ 敏感配置 ============
 # 本地配置文件（包含密码和 API Key）
-apps/backend/config.yaml
+backend/config.yaml
 .env
 .env.local
 .env.*.local
