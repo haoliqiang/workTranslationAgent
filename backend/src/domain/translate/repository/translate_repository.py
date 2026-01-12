@@ -8,11 +8,11 @@ from uuid import UUID
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from dao.translate.model.translation import Translation
+from domain.translate.model.translation import Translation
 
 
 if TYPE_CHECKING:
-    from dao.translate.agent.translate_agent import TranslateResult
+    from domain.translate.agent.translate_agent import TranslateResult
 
 
 class TranslateRepository:

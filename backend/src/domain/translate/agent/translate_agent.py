@@ -13,12 +13,12 @@ from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
 from core.logging import get_logger
-from dao.translate.agent.tools import (
+from domain.translate.agent.tools import (
     analyze_gaps_with_llm,
     get_system_prompt,
 )
-from dao.translate.graph.checkpoint import TenantAwarePostgresSaver
-from dao.translate.prompts.dev_to_pm import DEV_TO_PM_SYSTEM_PROMPT
+from domain.translate.graph.checkpoint import TenantAwarePostgresSaver
+from domain.translate.prompts.dev_to_pm import DEV_TO_PM_SYSTEM_PROMPT
 
 
 logger = get_logger(__name__)

@@ -9,9 +9,9 @@ from uuid import UUID
 from langchain_core.language_models import BaseChatModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from dao.translate.agent.translate_agent import TranslateAgent, TranslateResult
-from dao.translate.repository.translate_repository import TranslateRepository
-from dao.translate.schema.response import TranslateResponse, TranslationRecord
+from domain.translate.agent.translate_agent import TranslateAgent, TranslateResult
+from domain.translate.repository.translate_repository import TranslateRepository
+from domain.translate.schema.response import TranslateResponse, TranslationRecord
 
 
 class TranslateService:

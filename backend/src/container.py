@@ -8,8 +8,8 @@
 from dependency_injector import containers, providers
 
 from config import config_manager
-from dao.translate.repository.translate_repository import TranslateRepository
-from dao.translate.service.translate_service import TranslateService
+from domain.translate.repository.translate_repository import TranslateRepository
+from domain.translate.service.translate_service import TranslateService
 from llm.dashscope import create_dashscope_llm
 
 

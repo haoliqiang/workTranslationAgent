@@ -69,7 +69,7 @@ class ConfigLoader:
             logger.info("Using config from current directory: %s", resolved)
             return str(resolved)
 
-        backend_path = Path("apps/backend") / default_path
+        backend_path = Path("backend") / default_path
         if backend_path.exists():
             resolved = backend_path.resolve()
             logger.info("Using config from apps/backend: %s", resolved)
@@ -83,7 +83,7 @@ class ConfigLoader:
             return str(resolved)
 
         logger.warning(
-            "Config file '%s' not found in any standard location. Tried: cwd, apps/backend, %s",
+            "Config file '%s' not found in any standard location. Tried: cwd, backend, %s",
             default_path,
             code_dir,
         )

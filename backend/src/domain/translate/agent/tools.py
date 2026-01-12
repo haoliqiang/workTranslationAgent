@@ -9,8 +9,8 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
-from dao.translate.prompts.dev_to_pm import DEV_TO_PM_SYSTEM_PROMPT
-from dao.translate.prompts.pm_to_dev import PM_TO_DEV_SYSTEM_PROMPT
+from domain.translate.prompts.dev_to_pm import DEV_TO_PM_SYSTEM_PROMPT
+from domain.translate.prompts.pm_to_dev import PM_TO_DEV_SYSTEM_PROMPT
 
 
 class PerspectiveResult(BaseModel):

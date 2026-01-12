@@ -215,7 +215,7 @@ workTranslationAgent/
 │   │   │   ├── logging/         # 日志配置
 │   │   │   ├── sse/             # SSE 事件处理
 │   │   │   └── type/            # 类型定义
-│   │   ├── dao/translate/    # 翻译业务域
+│   │   ├── domain/translate/    # 翻译业务域
 │   │   │   ├── agent/           # LangGraph Agent
 │   │   │   │   ├── translate_agent.py  # Agent 实现
 │   │   │   │   └── tools.py     # 工具函数

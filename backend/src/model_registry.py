@@ -4,7 +4,7 @@
 Alembic 迁移脚本需要导入此模块。
 """
 
-from dao.translate.model.translation import Translation
+from domain.translate.model.translation import Translation
 
 
 __all__ = ["Translation"]

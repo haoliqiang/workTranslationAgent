@@ -14,9 +14,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.api.response import CommonResponse, error_response, success_response
 from core.database.session import db_session
 from core.sse.events import sse_event
-from dao.translate.schema.request import TranslateRequest
-from dao.translate.schema.response import TranslateResponse, TranslationRecord
-from dao.translate.service.translate_service import TranslateService
+from domain.translate.schema.request import TranslateRequest
+from domain.translate.schema.response import TranslateResponse, TranslationRecord
+from domain.translate.service.translate_service import TranslateService
 
 
 logger = logging.getLogger(__name__)
