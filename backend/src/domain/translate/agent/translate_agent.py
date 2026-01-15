@@ -13,6 +13,7 @@ from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
 from core.logging import get_logger
+from domain.translate.agent.react_parser import ReActParser
 from domain.translate.agent.tools import (
     analyze_gaps_with_llm,
     get_system_prompt,
@@ -170,7 +171,16 @@ class TranslateAgent:
                 HumanMessage(content=self._build_translate_prompt(content, state.get("context"), gaps)),
             ]
             response = await self.llm.ainvoke(messages)
-            translated_content = _extract_text_content(response)
+            response_text = _extract_text_content(response)
+            
+            # 解析 ReAct 格式，提取最终答案
+            final_answer = ReActParser.extract_final_answer(response_text)
+            if final_answer:
+                translated_content = final_answer
+            else:
+                # 如果没有找到 Final Answer，使用原始响应
+                translated_content = response_text
+            
             return {"translated_content": translated_content}
         except Exception as e:
             logger.exception("翻译节点失败")
@@ -283,15 +293,31 @@ class TranslateAgent:
 
         try:
             content_parts: list[str] = []
+            accumulated_text = ""
             async for chunk in self.llm.astream(messages):
                 delta = _extract_chunk_content(chunk)
                 if delta:
                     content_parts.append(delta)
+                    accumulated_text += delta
+                    
+                    # 尝试解析 ReAct 格式的流式输出
+                    completed_step, _ = ReActParser.parse_streaming(accumulated_text)
+                    if completed_step:
+                        # 如果解析到完整的步骤，可以发送步骤信息（可选）
+                        if completed_step.final_answer:
+                            # 如果已获得最终答案，发送最终答案的增量部分
+                            pass
+                    
                     yield {
                         "event": "content_delta",
                         "data": {"delta": delta},
                     }
             full_content = "".join(content_parts)
+            
+            # 从完整内容中提取最终答案
+            final_answer = ReActParser.extract_final_answer(full_content)
+            if final_answer:
+                full_content = final_answer
 
             logger.info("[流式] 翻译完成，方向: %s", final_direction)
             yield {
@@ -317,7 +343,8 @@ class TranslateAgent:
         gaps: list[dict[str, Any]],
     ) -> str:
         """构建翻译提示"""
-        prompt_parts = [f"请翻译以下内容：\n\n{content}"]
+        prompt_parts = ["请按照 ReAct 格式进行翻译。\n"]
+        prompt_parts.append(f"\n待翻译内容：\n{content}")
 
         if context:
             prompt_parts.append(f"\n\n补充上下文：\n{context}")
@@ -327,5 +354,14 @@ class TranslateAgent:
             prompt_parts.append(
                 "\n\n注意：输入中可能缺失以下信息，请在翻译时适当补充或标注：\n" + "\n".join(gap_descriptions)
             )
+        
+        prompt_parts.append(
+            "\n\n请按照以下格式输出：\n"
+            "Thought: [分析待翻译内容，理解关键信息]\n"
+            "Action: translate_to_target\n"
+            "Action Input: [待翻译的内容和上下文]\n"
+            "Observation: [初步翻译结果]\n"
+            "Final Answer: [最终的翻译结果，按照系统提示中的输出格式要求]"
+        )
 
         return "".join(prompt_parts)

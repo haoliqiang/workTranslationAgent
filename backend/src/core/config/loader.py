@@ -4,7 +4,7 @@
 加载优先级:
 1. 环境变量 CONFIG_PATH
 2. 当前工作目录
-3. apps/backend/ 目录（从项目根目录启动）
+3. backend/ 目录（从项目根目录启动）
 4. 代码所在目录的上级目录
 """
 
@@ -48,7 +48,7 @@ class ConfigLoader:
         查找优先级:
         1. 环境变量 CONFIG_PATH
         2. 当前工作目录（Working Directory）
-        3. apps/backend/ 目录（从项目根目录启动）
+        3. backend/ 目录（从项目根目录启动）
         4. 代码所在目录的上级目录（从 src/ 启动）
 
         Args:

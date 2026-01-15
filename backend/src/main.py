@@ -20,7 +20,7 @@ from fastapi.staticfiles import StaticFiles
 
 from config import config_manager
 from container import AppContainer
-# from core.cache.redis_service import redis_service
+from core.cache.redis_service import redis_service
 from core.database.session import close_db_engines, initialize_db_engines, run_migrations
 from core.logging import configure_logging, get_bootstrap_logger, get_startup_logger
 from domain.translate.api.routes import router as translate_router
@@ -43,7 +43,7 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None]:
 
     startup_logger.info("正在启动 workTranslationAgent...")
 
-    # redis_service()
+    redis_service()
     startup_logger.info("Redis 连接初始化完成")
 
     await initialize_db_engines()

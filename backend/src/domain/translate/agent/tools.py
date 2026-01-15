@@ -9,6 +9,7 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
+from domain.translate.agent.react_parser import ReActParser
 from domain.translate.prompts.dev_to_pm import DEV_TO_PM_SYSTEM_PROMPT
 from domain.translate.prompts.pm_to_dev import PM_TO_DEV_SYSTEM_PROMPT
 
@@ -59,6 +60,18 @@ PERSPECTIVE_ANALYSIS_PROMPT = """你是一个专业的沟通分析师，擅长�
 
 GAPS_ANALYSIS_PROMPT_PM = """你是一个资深的开发工程师，正在审阅产品经理的需求描述。
 
+你必须按照 ReAct 格式输出：
+
+Thought: [分析需求内容，思考可能缺失的信息]
+
+Action: analyze_gaps
+
+Action Input: [待分析的产品需求内容]
+
+Observation: [分析结果，列出缺失的信息]
+
+Final Answer: [返回 JSON 格式的分析结果]
+
 请分析以下产品需求，识别其中可能缺失的关键信息，这些信息对于开发工程师理解和实现需求非常重要。
 
 关注点：
@@ -94,6 +107,18 @@ GAPS_ANALYSIS_PROMPT_PM = """你是一个资深的开发工程师，正在审阅
 
 
 GAPS_ANALYSIS_PROMPT_DEV = """你是一个资深的产品经理，正在审阅开发工程师的技术方案。
+
+你必须按照 ReAct 格式输出：
+
+Thought: [分析技术方案，思考可能缺失的信息]
+
+Action: analyze_gaps
+
+Action Input: [待分析的技术方案内容]
+
+Observation: [分析结果，列出缺失的信息]
+
+Final Answer: [返回 JSON 格式的分析结果]
 
 请分析以下技术方案，识别其中可能缺失的关键信息，这些信息对于产品经理理解方案和做出决策非常重要。
 
@@ -170,6 +195,12 @@ async def identify_perspective_with_llm(content: str, llm: BaseChatModel) -> dic
     try:
         response = await llm.ainvoke(messages)
         response_text = str(response.content) if hasattr(response, "content") else str(response)
+        
+        # 解析 ReAct 格式，提取 Final Answer
+        final_answer = ReActParser.extract_final_answer(response_text)
+        if final_answer:
+            response_text = final_answer
+        
         result = _extract_json_from_response(response_text)
         # 验证并规范化结果
         perspective = result.get("perspective", "unknown")
@@ -215,13 +246,19 @@ async def analyze_gaps_with_llm(
         return {"gaps": [], "suggestions": []}
 
     messages = [
-        SystemMessage(content="你是一个专业的需求分析师，擅长发现沟通中的信息缺失。请严格按要求返回 JSON 格式。"),
+        SystemMessage(content="你是一个专业的需求分析师，擅长发现沟通中的信息缺失。请严格按要求使用 ReAct 格式输出，并在 Final Answer 中返回 JSON 格式。"),
         HumanMessage(content=prompt),
     ]
 
     try:
         response = await llm.ainvoke(messages)
         response_text = str(response.content) if hasattr(response, "content") else str(response)
+        
+        # 解析 ReAct 格式，提取 Final Answer
+        final_answer = ReActParser.extract_final_answer(response_text)
+        if final_answer:
+            response_text = final_answer
+        
         result = _extract_json_from_response(response_text)
         # 验证并规范化结果
         gaps = result.get("gaps", [])
